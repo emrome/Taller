@@ -1,0 +1,102 @@
+{Modifique el programa anterior para que cada equipo repita el recorrido con las siguientes 20 esquinas} {de sus correspondientes calles.}
+programa ej3b
+procesos
+  proceso juntarFlores(ES flor:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      flor:=flor+1
+  fin
+  proceso recorrerEsqs(E cant:numero; ES flores:numero)
+  comenzar
+    repetir cant -1
+      juntarFlores(flores)
+      mover
+    juntarFlores(flores)
+  fin
+  
+areas
+  areaA:AreaPC(1,1,40,1)
+  areaB:AreaPC(1,5,40,5)
+
+
+robots
+  robot A1
+  variables
+    flores:numero
+  comenzar
+    derecha
+    flores:=0
+    recorrerEsqs(10,flores)
+    EnviarMensaje(flores,robotA2)
+    Pos(PosAv+11,PosCa)
+    recorrerEsqs(10,flores)
+    EnviarMensaje(flores,robotA2)
+
+    
+  fin
+  
+  robot B1
+  variables
+    flores:numero
+  comenzar
+    derecha
+    flores:=0
+    recorrerEsqs(10,flores)
+    EnviarMensaje(flores,robotB2)
+    Pos(PosAv+11,PosCa)
+    recorrerEsqs(10,flores)
+    EnviarMensaje(flores,robotB2)
+
+  fin
+
+  robot A2
+  variables
+    floresT:numero
+    posAv:numero
+  comenzar
+    derecha
+    posAv:=11
+    repetir 2
+      Pos(posAv,PosCa)
+      RecibirMensaje(floresT,robotA1)
+      recorrerEsqs(10,floresT)
+      posAv:=PosAv+11
+    Informar(floresT)
+  fin
+  
+  robot B2
+  variables
+    floresT:numero
+    posAv:numero
+  comenzar
+    derecha
+    posAv:=11
+    repetir 2
+      Pos(posAv,PosCa)
+      RecibirMensaje(floresT,robotB1)
+      recorrerEsqs(10,floresT)
+      posAv:=PosAv+11
+    Informar(floresT)
+  fin
+
+  
+variables
+  robotA1:A1
+  robotA2:A2
+  robotB1:B1
+  robotB2:B2
+
+comenzar
+  AsignarArea(robotA1,areaA)
+  AsignarArea(robotA2,areaA)
+  AsignarArea(robotB1,areaB)
+  AsignarArea(robotB2,areaB)
+  Iniciar(robotA1,1,1)
+  Iniciar(robotA2,11,1)
+  Iniciar(robotB1,1,5)
+  Iniciar(robotB2,11,5)
+fin
+
+
+

@@ -1,0 +1,114 @@
+{Realice un programa en el que cuatro robots realizan las siguientes actividades:}
+ 
+{- El robot 1 debe limpiar de flores las primeras 20 esquinas de las calles 75 y 80. Al}  
+{finalizar cada calle, debe depositar todas las flores en la ultima esquina.}  
+
+{- El robot 2 debe limpiar de papeles las ultimas 20 esquinas de las avenidas 75 y 80. Al}  
+{finalizar cada avenida debe depositar todos los papeles en la primera esquina.} 
+ 
+{- El robot 3 debe limpiar de flores las ultimas 20 esquinas de las calles 10 y 15. Al}   
+{finalizar cada calle, debe depositar todas las flores en la ultima esquina.}  
+
+{- El robot 4 debe limpiar de papeles las primeras 20 esquinas de las avenidas 10 y 15.}  
+{Al finalizar cada avenida debe depositar todos los papeles en la primera esquina.}  
+programa ej5  
+procesos 
+  proceso juntarFlores 
+  comenzar 
+    mientras HayFlorEnLaEsquina 
+      tomarFlor 
+  fin 
+  
+  proceso juntarPapeles  
+  comenzar 
+    mientras HayPapelEnLaEsquina  
+      tomarPapel  
+  fin  
+  
+  proceso dejarFlores   
+  comenzar  
+    mientras HayFlorEnLaBolsa  
+      depositarFlor  
+  fin  
+   
+  proceso dejarPapeles   
+  comenzar  
+    mientras HayPapelEnLaBolsa  
+      depositarPapel  
+  fin  
+  
+  proceso limpiarAvenida(E cant:numero) 
+  comenzar 
+    repetir cant -1
+      juntarPapeles
+      mover
+    juntarPapeles
+    Pos(PosAv,PosCa -19)
+    dejarPapeles 
+  fin  
+ 
+  proceso limpiarCalle(E av:numero; E ca:numero;E cant:numero) 
+  comenzar 
+    Pos(av,ca)
+    repetir cant  -1
+      juntarFlores 
+      mover 
+    juntarFlores
+    dejarFlores 
+  fin  
+  
+areas  
+  area1:AreaP(1,75,20,75)
+  area1a:AreaP(1,80,20,80)
+  
+  area2:AreaP(75,80,75,100)
+  area2a:AreaP(80,80,80,100)
+  
+  area3:AreaP(80,10,100,10) 
+  area3a:AreaP(80,15,100,15)
+  
+  area4:AreaP(10,1,10,20) 
+  area4a:AreaP(15,1,15,20)
+  
+  ciudad:AreaC(1,1,100,100) 
+robots 
+  robot tipo1 
+  comenzar 
+    derecha
+    limpiarCalle(PosAv,PosCa,20) 
+    limpiarCalle(PosAv - 19,PosCa+5,20)
+  fin 
+  
+  robot tipo2 
+  comenzar 
+    limpiarAvenida(20)
+    Pos(PosAv+5,PosCa) 
+    limpiarAvenida(20) 
+  fin 
+
+  
+variables
+  robot1:tipo1
+  robot2:tipo2
+  robot3:tipo1
+  robot4:tipo2
+
+comenzar
+  AsignarArea(robot1,area1)
+  AsignarArea(robot1,area1a)
+  
+  AsignarArea(robot2,area2)
+  AsignarArea(robot2,area2a)
+  
+  AsignarArea(robot3,area3)
+  AsignarArea(robot3,area3a)
+  
+  AsignarArea(robot4,area4)
+  AsignarArea(robot4,area4a)
+  
+  Iniciar(robot1,1,75)
+  Iniciar(robot2,75,81)
+  Iniciar(robot3,81,10)
+  Iniciar(robot4,10,1)
+fin
+

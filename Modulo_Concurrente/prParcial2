@@ -1,0 +1,128 @@
+{Existen dos equipos de robots, el azul y el verde, de dos robots cada uno. En cada equipo,un robot florero recorre un trayecto de 10 esquinas por la misma calle juntando todas las flores que encuentra, y un robot papelero recorre un trayecto de 20 esquinas por la misma avenida juntando los papeles.}
+{El robot florero azul comienza en (3,6)
+{El robot florero verde comienza en (17,6)
+{El robot papelero azul comienza en (7,4)
+{El robot papelero verde comienza en (21,4)
+{Al finalizar el programa, un robot fiscalizador debera informar que equipo finalizo primero}
+programa practica
+procesos
+  proceso juntarFlores
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+  fin
+  
+  proceso juntarPapeles
+  comenzar
+    mientras HayPapelEnLaEsquina
+      tomarPapel
+  fin
+  proceso esquinaPapeles
+  comenzar
+    juntarPapeles
+    mover
+  fin
+  proceso esquinaFlores
+  comenzar
+    juntarFlores
+    mover
+  fin
+areas
+  areaAzul:AreaPC(3,4,13,24)
+  areaVerde:AreaPC(17,4,27,24)
+  areaF:AreaP(1,1,1,1)
+  
+robots
+  robot papelero
+  variables
+    id:numero
+  comenzar
+
+    RecibirMensaje(id,rFiscal)
+    {junto primera esquina}
+    esquinaPapeles
+    juntarPapeles
+    {bloqueo esquina conflictiva}
+    BloquearEsquina(PosAv,PosCa+1)
+    mover
+    esquinaPapeles
+    LiberarEsquina(PosAv,PosCa -1)
+    repetir 17
+      esquinaPapeles
+    juntarPapeles
+    EnviarMensaje(id,rFiscal)
+  fin
+  
+  robot florero
+  variables
+    id:numero
+  comenzar
+    derecha
+    RecibirMensaje(id,rFiscal)
+    {junto primera esquina}
+    repetir 3
+      esquinaFlores
+    
+    juntarFlores
+    {bloqueo esquina conflictiva}
+    BloquearEsquina(PosAv+1,PosCa)
+    mover
+    esquinaFlores
+    LiberarEsquina(PosAv -1,PosCa)
+    
+    repetir 5
+      esquinaFlores
+    juntarFlores
+    
+    EnviarMensaje(id,rFiscal)
+  fin
+  
+  robot fiscal
+  variables
+    verde,azul,id,cant:numero
+  comenzar
+    EnviarMensaje(1,fAzul)
+    EnviarMensaje(1,pAzul)
+    EnviarMensaje(2,fVerde)
+    EnviarMensaje(2,pVerde)
+    verde:=0
+    azul:=0
+    cant:=0
+    mientras (azul<2)&(verde<2)
+      RecibirMensaje(id,*)
+      cant:=cant+1
+      si(id=1)
+        azul:=azul+1
+      sino 
+        si(id=2)
+          verde:=verde+1
+    repetir (4-cant){recibo mensajes que me faltan}
+      RecibirMensaje(id,*)
+      
+    si verde=2
+      Informar(2)
+    sino
+      Informar(1)
+  fin
+  
+variables
+  fAzul,fVerde:florero
+  pAzul,pVerde:papelero
+  rFiscal:fiscal
+comenzar
+  AsignarArea(rFiscal,areaF)
+  AsignarArea(fAzul,areaAzul)
+  AsignarArea(pAzul,areaAzul)
+  AsignarArea(fVerde,areaVerde)
+  AsignarArea(pVerde,areaVerde)
+  Iniciar(rFiscal,1,1)
+  Iniciar(fAzul,3,6)
+  Iniciar(pAzul,7,4)
+  Iniciar(fVerde,17,6)
+  Iniciar(pVerde,21,4)
+fin
+
+
+
+
+

@@ -1,0 +1,104 @@
+{4b-Implemente una variante en la cual los robots luego de tomar cada flor de la esquina (10,10) vuelvan a su esquina inicial, pasen a la esquina (11,11) a depositarla y finalmente vuelvan a la esquina inicial}
+programa ej4b
+procesos 
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      flores:=flores+1
+  fin
+  
+areas
+  esquina10:AreaPC(10,10,10,10)
+  esquina11:AreaC(11,11,11,11)
+  areaCoord:AreaP(1,1,1,1) 
+  inicio1:AreaP(9,9,9,9)
+  inicio2:AreaP(9,10,9,10)
+  inicio3:AreaP(9,11,9,11)
+  inicio4:AreaP(9,12,9,12)
+  
+robots
+  robot tipo1
+  variables
+    avO,caO:numero
+    id:numero
+    hayFlor:boolean
+  comenzar
+    RecibirMensaje(id,rCoordinador)
+    
+    avO:=PosAv
+    caO:=PosCa
+    
+    hayFlor:=V
+    mientras hayFlor
+      BloquearEsquina(10,10)
+      Pos(10,10)
+      si HayFlorEnLaEsquina
+        tomarFlor
+      sino
+        hayFlor:=F
+      Pos(avO,caO)
+      LiberarEsquina(10,10)
+      si hayFlor
+        BloquearEsquina(11,11)
+        Pos(11,11)
+        depositarFlor
+        Pos(avO,caO)
+        LiberarEsquina(11,11)
+
+    
+    EnviarMensaje(id,rCoordinador)
+  fin
+  
+  robot coordinador
+  variables
+    ultimo:numero
+    flores:numero
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+    
+    repetir 4
+      RecibirMensaje(ultimo,*)
+    Pos(11,11)
+    juntarFlores(flores)
+    Pos(1,1)
+
+  fin
+  
+variables
+  r1:tipo1
+  r2:tipo1
+  r3:tipo1
+  r4:tipo1
+  rCoordinador:coordinador
+  
+comenzar    
+  AsignarArea(rCoordinador,esquina11)
+  AsignarArea(rCoordinador,areaCoord)
+  AsignarArea(r1,esquina10)
+  AsignarArea(r1,esquina11)
+  AsignarArea(r1,inicio1)
+  AsignarArea(r2,esquina10)
+  AsignarArea(r2,esquina11)
+  AsignarArea(r2,inicio2)
+  AsignarArea(r3,esquina10)
+  AsignarArea(r3,esquina11)
+  AsignarArea(r3,inicio3)
+  AsignarArea(r4,esquina10)
+  AsignarArea(r4,esquina11)
+  AsignarArea(r4,inicio4)
+  
+  Iniciar(rCoordinador,1,1)
+  Iniciar(r1,9,9)
+  Iniciar(r2,9,10)
+  Iniciar(r3,9,11)
+  Iniciar(r4,9,12)
+fin
+
+
+
+
+

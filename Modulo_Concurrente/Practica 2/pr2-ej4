@@ -1,0 +1,139 @@
+{Realice un programa en el que un robot fiscalizador controla el acceso de 4 robots recolectores al cuadrante encerrado entre las esquinas (25,25) y (75,75) . Para ello, el robot fiscalizador avisa a un robot recolector aleatorio que puede ingresar al area. El robot que recibe la autorizacion de acceso calcula una esquina aleatoria dentro del area, limpia dicha esquina de flores y papeles, regresa a su esquina y avisa al robot fiscalizador que ya finalizo.}
+{Se realizaran en total 10 accesos al cuadrante entre los 4 robots recolectores. Al finalizar, el robot fiscalizador debera indicar al robot ganador que se posicione en la esquina (50,50). El robot fiscalizador inicia en la esquina (1,1) y los robots recolectores inician en las esquinas(25,1) (30,1) (35,1) y (40,1) respectivamente}
+programa ej4
+procesos
+  proceso juntarFlores(ES elem:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      elem:=elem+1
+  fin
+  
+  proceso juntarPapeles(ES elem:numero)
+  comenzar
+    mientras HayPapelEnLaEsquina
+      tomarPapel
+      elem:=elem+1
+  fin
+  
+  proceso esquina(ES elemT:numero)
+  variables
+    flores,papeles:numero
+    av,ca:numero
+  comenzar
+    flores:=0
+    papeles:=0
+    Random(av,25,75)
+    Random(ca,25,75)
+    Pos(av,ca)
+    juntarPapeles(papeles)
+    juntarFlores(flores)
+    elemT:=flores+papeles
+  fin
+  
+  proceso enviarCod(E id:numero; E aux:numero)
+  comenzar
+    si (id=1)
+      EnviarMensaje(aux,robot1)
+    sino
+      si(id=2)
+        EnviarMensaje(aux,robot2)
+      sino
+        si(id=3)
+          EnviarMensaje(aux,robot3)
+        sino
+          si (id=4)
+            EnviarMensaje(aux,robot4)
+  fin
+  
+  proceso calcularMaximo(E id:numero;E cant:numero; ES idMax:numero; ES max:numero)
+  comenzar
+    si cant>max
+      max:=cant
+      idMax:=id
+  fin
+  
+areas
+  cuadrante:AreaPC(25,25,75,75)
+  area1:AreaP(25,1,25,1)
+  area2:AreaP(30,1,30,1)
+  area3:AreaP(35,1,35,1)
+  area4:AreaP(40,1,40,1)
+  areaF:AreaP(1,1,1,1)
+
+{ recibe 0, manda elementos//1 espero autorizacion}
+robots
+  robot recolector
+  variables
+    acceso,elem,elemT:numero
+    av,ca:numero
+  comenzar
+    elemT:=0
+    av:=PosAv
+    ca:=PosCa
+    RecibirMensaje(acceso,rFiscal)
+    mientras acceso<>0
+      esquina(elem)
+      elemT:=elemT+elem
+      Pos(av,ca)
+      EnviarMensaje(1,rFiscal){envio que terminé de juntar}
+      RecibirMensaje(acceso,rFiscal)
+   {MANDA ELEMENTOS TOTALES, DE TODAS LAS PASADAS}
+    si acceso=0 {si me mandan 0 devuelvo los elementos juntados}
+      EnviarMensaje(elemT,rFiscal)
+      Informar(elemT)
+   
+    RecibirMensaje(acceso,rFiscal){si aux=1, es el ganador}
+    si acceso=1
+      Pos(50,50)
+  fin  
+  
+  robot fiscalizador
+  variables
+    id,idMax,cant,max:numero
+  comenzar
+    repetir 10
+      Random(id,1,4)
+      enviarCod(id,1)
+      RecibirMensaje(id,*){es para que espere a que el robot finalice}
+    
+    id:=0
+    max:=-1
+    repetir 4
+      id:=id+1
+      enviarCod(id,0){manda a los robots la "señal" para que manden los elementos juntados}
+      RecibirMensaje(cant,*)
+      calcularMaximo(id,cant,idMax,max)
+    
+    repetir 4 {envia al ganador la señal para posicionarse en (50,50)}
+      si (id<>idMax)
+        enviarCod(id,0)
+      sino
+        enviarCod(id,1)
+      id:=id -1
+  fin 
+variables
+  robot1:recolector
+  robot2:recolector
+  robot3:recolector
+  robot4:recolector
+  rFiscal:fiscalizador
+comenzar
+  AsignarArea(robot1,area1)
+  AsignarArea(robot1,cuadrante)
+  AsignarArea(robot2,area2) 
+  AsignarArea(robot2,cuadrante)
+  AsignarArea(robot3,area3)
+  AsignarArea(robot3,cuadrante)
+  AsignarArea(robot4,area4)
+  AsignarArea(robot4,cuadrante)
+  AsignarArea(rFiscal,areaF)
+  Iniciar(rFiscal,1,1)
+  Iniciar(robot1,25,1)
+  Iniciar(robot2,30,1)
+  Iniciar(robot3,35,1)
+  Iniciar(robot4,40,1)
+fin
+
+
+

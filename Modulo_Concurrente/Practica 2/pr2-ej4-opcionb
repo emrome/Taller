@@ -1,0 +1,127 @@
+{envian los elementos de cada pasada, NO totales}
+programa ej4b
+procesos
+  proceso juntarFlores(ES elem:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      elem:=elem+1
+  fin
+  
+  proceso juntarPapeles(ES elem:numero)
+  comenzar
+    mientras HayPapelEnLaEsquina
+      tomarPapel
+      elem:=elem+1
+  fin
+  
+  proceso esquina(ES elemT:numero)
+  variables
+    flores,papeles:numero
+    av,ca:numero
+  comenzar
+    flores:=0
+    papeles:=0
+    Random(av,25,75)
+    Random(ca,25,75)
+    Pos(av,ca)
+    juntarPapeles(papeles)
+    juntarFlores(flores)
+    elemT:=flores+papeles
+  fin
+  
+  proceso enviarCod(E id:numero; E aux:numero)
+  comenzar
+    si (id=1)
+      EnviarMensaje(aux,robot1)
+    sino
+      si(id=2)
+        EnviarMensaje(aux,robot2)
+      sino
+        si(id=3)
+          EnviarMensaje(aux,robot3)
+        sino
+          si (id=4)
+            EnviarMensaje(aux,robot4)
+  fin
+  
+  proceso calcularMaximo(E id:numero;E cant:numero; ES idMax:numero; ES max:numero)
+  comenzar
+    si cant>max
+      max:=cant
+      idMax:=id
+  fin
+  
+areas
+  cuadrante:AreaPC(25,25,75,75)
+  area1:AreaP(25,1,25,1)
+  area2:AreaP(30,1,30,1)
+  area3:AreaP(35,1,35,1)
+  area4:AreaP(40,1,40,1)
+  areaF:AreaP(1,1,1,1)
+
+{ recibe 0, manda elementos//1 espero autorizacion}
+robots
+  robot recolector
+  variables
+    aux,elemT:numero
+    av,ca:numero
+  comenzar
+    av:=PosAv
+    ca:=PosCa
+    RecibirMensaje(aux,rFiscal)
+    mientras aux=1
+      esquina(elemT)
+      Pos(av,ca)
+      Informar(elemT)
+     {envio que termino de juntar}
+      EnviarMensaje(elemT,rFiscal)
+      RecibirMensaje(aux,rFiscal)
+    si aux=2 {si aux=2, es el ganador}
+      Pos(50,50)
+  fin  
+  
+  robot fiscalizador
+  variables
+    id,idMax,cant,max:numero
+  comenzar
+    max:=-1
+    repetir 10
+      Random(id,1,4)
+      enviarCod(id,1)
+      RecibirMensaje(cant,*){es para que espere a que el robot finalice}
+      calcularMaximo(id,cant,idMax,max)
+    id:=0    
+    repetir 4 {envia al ganador la señal para posicionarse en (50,50)}
+      id:=id+1
+      si (id=idMax)
+        enviarCod(id,2)
+      sino
+        enviarCod(id,0)
+      
+  fin 
+variables
+  robot1:recolector
+  robot2:recolector
+  robot3:recolector
+  robot4:recolector
+  rFiscal:fiscalizador
+comenzar
+  AsignarArea(robot1,area1)
+  AsignarArea(robot1,cuadrante)
+  AsignarArea(robot2,area2) 
+  AsignarArea(robot2,cuadrante)
+  AsignarArea(robot3,area3)
+  AsignarArea(robot3,cuadrante)
+  AsignarArea(robot4,area4)
+  AsignarArea(robot4,cuadrante)
+  AsignarArea(rFiscal,areaF)
+  Iniciar(rFiscal,1,1)
+  Iniciar(robot1,25,1)
+  Iniciar(robot2,30,1)
+  Iniciar(robot3,35,1)
+  Iniciar(robot4,40,1)
+fin
+
+
+

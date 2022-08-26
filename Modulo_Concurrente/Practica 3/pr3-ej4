@@ -1,0 +1,101 @@
+{Realice un programa en el que 4 robots mueven de a una todas las flores de la esquina (10,10) a la esquina (11,11). Para ello, cada robot que toma una flor de la esquina (10,10) la deposita en la esquina (11,11) y luego retorna a su esquina inicial. Cada robot que finaliza (o, sea, que detecta que la esquina (10,10) se ha vaciado) deberá avisar al robot coordinador que ha finalizado. Cuando todos los robots finalizaron, el robot coordinador deberá informar qué robot finalizó último y a continuación deberá recolectar todas las flores de la esquina (11,11).}
+{El robot coordinador inicia en la esquina (1,1).Los robots inician en las esquinas (9,9) (9,10) (9,11) y (9,12).}
+programa ej4
+procesos 
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      flores:=flores+1
+  fin
+  
+areas
+  esquina10:AreaPC(10,10,10,10)
+  esquina11:AreaC(11,11,11,11)
+  areaCoord:AreaP(1,1,1,1) 
+  inicio1:AreaP(9,9,9,9)
+  inicio2:AreaP(9,10,9,10)
+  inicio3:AreaP(9,11,9,11)
+  inicio4:AreaP(9,12,9,12)
+  
+robots
+  robot tipo1
+  variables
+    avO,caO:numero
+    id:numero
+    hayFlor:boolean
+  comenzar
+    RecibirMensaje(id,rCoordinador)
+    
+    avO:=PosAv
+    caO:=PosCa
+    
+    hayFlor:=V
+    mientras hayFlor
+      BloquearEsquina(10,10)
+      Pos(10,10)
+      si HayFlorEnLaEsquina
+        tomarFlor
+        BloquearEsquina(11,11)
+        Pos(11,11)
+        LiberarEsquina(10,10)
+        depositarFlor
+        Pos(avO,caO)
+        LiberarEsquina(11,11)
+        
+      sino
+        hayFlor:=F
+        Pos(avO,caO)
+        LiberarEsquina(10,10)
+    
+    EnviarMensaje(id,rCoordinador)
+  fin
+  
+  robot coordinador
+  variables
+    ultimo:numero
+    flores:numero
+  comenzar
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+    
+    repetir 4
+      RecibirMensaje(ultimo,*)
+    Pos(11,11){NO bloquear porque NO HAY ROBOT}
+    juntarFlores(flores)
+    Pos(1,1)
+    Informar(flores)
+  fin
+  
+variables
+  r1:tipo1
+  r2:tipo1
+  r3:tipo1
+  r4:tipo1
+  rCoordinador:coordinador
+  
+comenzar    
+  AsignarArea(rCoordinador,esquina11)
+  AsignarArea(rCoordinador,areaCoord)
+  AsignarArea(r1,esquina10)
+  AsignarArea(r1,esquina11)
+  AsignarArea(r1,inicio1)
+  AsignarArea(r2,esquina10)
+  AsignarArea(r2,esquina11)
+  AsignarArea(r2,inicio2)
+  AsignarArea(r3,esquina10)
+  AsignarArea(r3,esquina11)
+  AsignarArea(r3,inicio3)
+  AsignarArea(r4,esquina10)
+  AsignarArea(r4,esquina11)
+  AsignarArea(r4,inicio4)
+  
+  Iniciar(rCoordinador,1,1)
+  Iniciar(r1,9,9)
+  Iniciar(r2,9,10)
+  Iniciar(r3,9,11)
+  Iniciar(r4,9,12)
+fin
+

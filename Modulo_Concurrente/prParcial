@@ -1,0 +1,127 @@
+{Tres robots corren una carrera, en la cual tienen 5 intentos para avanzar una determinada
+cantidad de pasos. En cada intento los robots podrán dar entre 1 y 10 pasos, y deberán juntar
+todos los papeles que encuentren en cada esquina de su camino. Un robot fiscalizador es el
+encargado de indicarle a cada robot la esquina al azar desde donde deberán comenzar la carrera,
+dentro del cuadrante comprendido entre las esquinas (1,1) y (21, 40):
+• El robot jugador 1 puede tener que empezar su recorrido en una avenida entre 1 y 7.
+• El robot jugador 2 puede tener que empezar su recorrido en una avenida entre 8 y 14.
+{• El robot jugador 3 puede tener que empezar su recorrido en una avenida entre 15 y 21 }
+{Al finalizar la carrera, los robots jugadores deben depositar en la esquina (1,30) todos los papeles que juntaron, y el robot fiscalizador debe informar qué robot dio más pasos. Los robots jugadores inician en las esquinas (1,1), (8,1) y (15,1), y el robot fiscalizador en la esquina (25,1)}
+programa prParc
+procesos 
+  proceso juntarPapeles(ES papel:numero)
+  comenzar
+    mientras HayPapelEnLaEsquina
+      tomarPapel
+      papel:=papel+1
+  fin
+  proceso minimo(E id:numero;E cant:numero;ES idMax:numero;ES max:numero)
+  comenzar
+    si cant>max
+      idMax:=id
+      max:=cant
+  fin
+  
+areas
+  area1:AreaP(1,1,7,100)
+  area2:AreaP(8,1,14,100)
+  area3:AreaP(15,1,21,100)
+  areaF:AreaP(25,1,25,1)
+  esquina:AreaPC(1,30,1,30)
+  
+robots
+  robot corredor
+  variables
+    av,avO,ca,caO,pasos:numero
+    pasosT,papeles:numero
+    id:numero
+  comenzar
+   { avO:=PosAv caO:=PosCa}
+    RecibirMensaje(id,rFiscal)
+    pasosT:=0
+    papeles:=0
+    
+    RecibirMensaje(av,rFiscal)
+    RecibirMensaje(ca,rFiscal)
+    Pos(av,ca)
+    
+    repetir 5
+      Random(pasos,1,10)
+      repetir pasos
+        juntarPapeles(papeles)
+        mover
+      pasosT:=pasosT+pasos
+        
+    EnviarMensaje(id,rFiscal)
+    EnviarMensaje(pasosT,rFiscal)
+
+    BloquearEsquina(1,30)
+    Pos(1,30)
+    repetir papeles
+      depositarPapel
+    Pos(av,ca)
+    LiberarEsquina(1,30)
+  fin
+  
+  
+  robot fiscalizador 
+  variables
+    av,ca:numero
+    idMax,max,cant,id:numero
+  comenzar
+    max:=0
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+   
+    Random(av,1,7)
+    Random(ca,1,40)
+    EnviarMensaje(av,r1)
+    EnviarMensaje(ca,r1)
+    
+    Random(av,8,14) 
+    Random(ca,1,40)
+    EnviarMensaje(av,r2)
+    EnviarMensaje(ca,r2)
+    
+    Random(av,15,21) 
+    Random(ca,1,40)
+    EnviarMensaje(av,r3)
+    EnviarMensaje(ca,r3)
+    
+    repetir 3 
+      RecibirMensaje(id,*)
+      si(id=1)
+        RecibirMensaje(cant,r1)
+      sino
+        si(id=2)
+          RecibirMensaje(cant,r2)
+        sino
+          RecibirMensaje(cant,r3)
+      minimo(id,cant,idMax,max)
+    
+    Informar(idMax)
+  fin
+
+variables
+  r1,r2,r3:corredor
+  rFiscal:fiscalizador
+comenzar
+  AsignarArea(rFiscal,areaF)
+  AsignarArea(r1,area1)
+  AsignarArea(r1,esquina)
+  AsignarArea(r2,area2)
+  AsignarArea(r2,esquina)
+  AsignarArea(r3,area3)
+  AsignarArea(r3,esquina)
+  
+  Iniciar(rFiscal,25,1)
+  Iniciar(r1,1,1)
+  Iniciar(r2,8,1)
+  Iniciar(r3,15,1)
+fin
+      
+
+
+
+

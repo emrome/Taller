@@ -1,0 +1,88 @@
+{Realice un programa con 2 equipos:
+{- El equipo A, compuesto por los robots A1 y A2, debe juntar papeles de las primeras 20 esquinas }
+{de la calle 1}
+{- El equipo B, compuesto por los robots B1 y B2, debe juntar flores de las primeras 20 esquinas}
+{de la calle 5}
+{Los robots A1 y B1 deberan realizar las 10 primeras esquinas de su recorrido, y al finalizar} {avisaran a los robots A2 y B2 respectivamente para que continuen con las siguientes 10 esquinas. }
+{El segundo robot de cada equipo debe informar la cantidad de elementos recogidos en las 20 esquinas}
+{Inicialice los 4 robots en las esquinas que considere mas apropiadas segun el trayecto que le} {corresponde realizar a cada uno.}
+programa ej3
+procesos
+  proceso juntarFlores(ES flor:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      flor:=flor+1
+  fin
+  proceso recorrerEsqs(E cant:numero; ES flores:numero)
+  comenzar
+    repetir cant -1
+      juntarFlores(flores)
+      mover
+    juntarFlores(flores)
+  fin
+  
+areas
+  areaA1:AreaP(1,1,10,1)
+  areaA2:AreaP(11,1,20,1)
+  areaB1:AreaP(1,5,10,5)
+  areaB2:AreaP(11,5,20,5)
+
+robots
+  robot A1
+  variables
+    flores:numero
+  comenzar
+    derecha
+    flores:=0
+    recorrerEsqs(10,flores)
+    EnviarMensaje(flores,robotA2)
+  fin
+  
+  robot B1
+  variables
+    flores:numero
+  comenzar
+    derecha
+    flores:=0
+    recorrerEsqs(10,flores)
+    EnviarMensaje(flores,robotB2)
+  fin
+
+  robot A2
+  variables
+    floresT:numero
+  comenzar
+    derecha
+    RecibirMensaje(floresT,robotA1)
+    recorrerEsqs(10,floresT)
+    Informar(floresT)
+  fin
+  
+  robot B2
+  variables
+    floresT:numero
+  comenzar
+    derecha
+    RecibirMensaje(floresT,robotB1)
+    recorrerEsqs(10,floresT)
+    Informar(floresT)
+  fin
+
+variables
+  robotA1:A1
+  robotA2:A2
+  robotB1:B1
+  robotB2:B2
+
+comenzar
+  AsignarArea(robotA1,areaA1)
+  AsignarArea(robotA2,areaA2)
+  AsignarArea(robotB1,areaB1)
+  AsignarArea(robotB2,areaB2)
+  Iniciar(robotA1,1,1)
+  Iniciar(robotA2,11,1)
+  Iniciar(robotB1,1,5)
+  Iniciar(robotB2,11,5)
+fin
+

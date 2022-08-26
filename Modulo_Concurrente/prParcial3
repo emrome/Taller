@@ -1,0 +1,185 @@
+programa Romero
+procesos
+  proceso juntarFlor
+  comenzar
+    si HayFlorEnLaEsquina
+      tomarFlor
+  fin
+  
+  proceso juntarPapel
+  comenzar
+    si  HayPapelEnLaEsquina
+      tomarPapel
+  fin
+  
+  proceso vaciarBolsa 
+  comenzar
+    mientras HayPapelEnLaBolsa
+      depositarPapel
+    mientras HayFlorEnLaBolsa
+      depositarFlor
+  fin
+
+  proceso clasificacion(E avO:numero;E caO:numero)
+  comenzar
+    repetir 10
+      juntarFlor
+      mover
+    juntarFlor
+    
+    mientras HayFlorEnLaBolsa
+      BloquearEsquina(21,13)
+      Pos(21,13)
+      depositarFlor
+      Pos(avO,caO)
+      LiberarEsquina(21,13)
+  fin
+  
+  proceso final(E avO:numero;E caO:numero) 
+  comenzar
+    repetir 10
+      juntarPapel
+      mover
+    juntarPapel
+    mientras HayPapelEnLaBolsa
+      BloquearEsquina(9,13)
+      Pos(9,13)
+      depositarPapel
+      Pos(avO,caO)
+      LiberarEsquina(9,13)
+  fin
+  
+  proceso enviarCod(E id:numero; E valor:numero)
+  comenzar
+    si(id=1)
+      EnviarMensaje(valor,r1)
+    sino
+      si(id=2)
+        EnviarMensaje(valor,r2)
+      sino
+        si(id=3)
+          EnviarMensaje(valor,r3)
+        sino
+          EnviarMensaje(valor,r4)
+  fin
+
+areas
+  esquinaD:AreaPC(9,13,21,13)
+  ini1:AreaP(1,1,1,1)
+  ini2:AreaP(2,2,2,2)
+  ini3:AreaP(3,3,3,3)
+  ini4:AreaP(4,4,4,4)
+  areaCarrera:AreaPC(10,10,20,16)
+  areaC:AreaP(5,5,5,5)
+  
+robots
+  robot tipo1
+  variables
+    id,aux:numero
+    avO,caO,ca:numero
+  comenzar
+    derecha
+    avO:=PosAv
+    caO:=PosCa
+    RecibirMensaje(id,rCoordinador)
+    RecibirMensaje(ca,rCoordinador)
+    Pos(10,ca)
+    clasificacion(avO,caO)
+    {envian que terminaron}
+    EnviarMensaje(id,rCoordinador)
+    
+    {si reciben 1 son finalistas}
+    RecibirMensaje(aux,rCoordinador)
+    si(aux=1)
+      repetir 2
+        derecha
+      RecibirMensaje(ca,rCoordinador)
+      Pos(20,ca)
+      final(avO,caO)
+      EnviarMensaje(id,rCoordinador)
+    Pos(avO,caO)
+  fin
+  
+  robot coordinador
+  variables
+    ganador,finalista1,finalista2:numero
+    id:numero
+    ca:numero
+  comenzar
+    id:=1
+    repetir 4
+      enviarCod(id,id)
+      id:=id+1
+    {otra opcion, ESTA ES MEJOR}
+    EnviarMensaje(1,r1)
+    EnviarMensaje(2,r2)
+    EnviarMensaje(3,r3)
+    EnviarMensaje(4,r4)
+    
+   { envio de calles}
+    id:=1
+    ca:=10
+    repetir 4
+      enviarCod(id,ca)
+      ca:=ca+2
+      id:=id+1
+    {otra opcion, MEJOR ES ESTA}
+    EnviarMensaje(10,r1) 
+    EnviarMensaje(12,r2) 
+    EnviarMensaje(14,r3) 
+    EnviarMensaje(16,r4) 
+   
+    {recibe cuando termina}
+    {a los primeros 2, le envia que son finalista}
+    RecibirMensaje(finalista1,*)
+    enviarCod(finalista1,1)
+    RecibirMensaje(finalista2,*)
+    enviarCod(finalista2,1)
+    repetir 2
+      RecibirMensaje(id,*)
+      enviarCod(id,0)
+    
+    {envia las calles a los finalista}
+    enviarCod(finalista1,11)
+    enviarCod(finalista2,15)
+    
+    RecibirMensaje(ganador,*)
+    RecibirMensaje(id,*)
+    Informar(ganador)
+  fin
+
+variables
+  r1,r2,r3,r4:tipo1
+  rCoordinador:coordinador
+comenzar
+  AsignarArea(rCoordinador,areaC)
+  AsignarArea(r1,ini1)
+  AsignarArea(r2,ini2)
+  AsignarArea(r3,ini3)
+  AsignarArea(r4,ini4)
+  AsignarArea(r1,esquinaD)
+  AsignarArea(r2,esquinaD)
+  AsignarArea(r3,esquinaD)
+  AsignarArea(r4,esquinaD)
+  AsignarArea(r1,areaCarrera)
+  AsignarArea(r2,areaCarrera)
+  AsignarArea(r3,areaCarrera)
+  AsignarArea(r4,areaCarrera)
+
+  Iniciar(rCoordinador,5,5)
+  Iniciar(r1,1,1)
+  Iniciar(r2,2,2)
+  Iniciar(r3,3,3)
+  Iniciar(r4,4,4)
+fin
+    
+    
+  
+  
+  
+
+
+
+
+
+

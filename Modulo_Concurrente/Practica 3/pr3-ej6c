@@ -1,0 +1,301 @@
+{c. Modifique el ejercicio anterior (6.a) para que ahora el robot fiscalizador espere a que}
+{todos los robots recolectores hayan completado sus cuadrantes antes de indicarles la calle}
+{que deberán recorrer}
+programa ej6c
+procesos
+  proceso enviarCod(E id:numero; E aux:numero)
+  comenzar
+    si id=1
+      EnviarMensaje(aux,r1)
+    sino
+      si id=2
+        EnviarMensaje(aux,r2)
+      sino
+        EnviarMensaje(aux,r3)
+  fin
+
+  proceso juntarFlores(ES flores:numero)
+  comenzar
+    mientras HayFlorEnLaEsquina
+      tomarFlor
+      flores:=flores+1
+  fin
+  proceso juntarPapeles(ES papeles:numero) 
+  comenzar
+    mientras HayPapelEnLaEsquina
+      tomarPapel
+      mover
+  fin
+  
+  proceso esquinasF(E cant:numero;ES flores:numero)
+  comenzar
+    repetir cant
+      mover
+      juntarFlores(flores)
+  fin
+  proceso esquinasP(E cant:numero;ES papeles:numero)
+  comenzar
+    repetir cant
+      mover
+      juntarPapeles(papeles)
+  fin
+  proceso esquinasFyP(E cant:numero;ES flores:numero;ES papeles:numero)
+  comenzar
+    repetir cant
+      mover
+      juntarFlores(flores)
+      juntarPapeles(papeles)
+  fin
+
+  proceso recorrerC2(ES flores:numero)
+  comenzar
+    {lado1}
+    esquinasF(6,flores)
+    derecha
+    
+    {lado2}
+    esquinasF(2,flores){dos esquina del segundo lado}
+    {esquina conflictiva y la sig}
+    BloquearEsquina(5,8)
+    mover
+    juntarFlores(flores)
+    mover
+    LiberarEsquina(5,8)
+    juntarFlores(flores)
+    esquinasF(2,flores)
+    derecha
+    
+    {lado3}
+    esquinasF(2,flores)
+    BloquearEsquina(8,5)
+    mover
+    juntarFlores(flores)
+    mover
+    LiberarEsquina(8,5)
+    juntarFlores(flores)
+    esquinasF(2,flores)
+    derecha
+    
+    {lado4}
+    esquinasF(6,flores)
+    derecha
+  fin
+  
+  proceso recorrerC5(ES flores:numero;ES papeles:numero)
+  comenzar
+    {lado1}
+    esquinasFyP(2,flores,papeles)
+    BloquearEsquina(5,8)
+    mover
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    mover
+    LiberarEsquina(5,8)
+    juntarFlores(flores)
+    juntarPapeles(flores)
+    esquinasFyP(6,flores,papeles)
+    derecha
+    
+    {lado2}
+    esquinasFyP(3,flores,papeles)
+    BloquearEsquina(9,15)
+    mover
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    mover
+    LiberarEsquina(9,15)
+    juntarFlores(flores)
+    juntarPapeles(flores)
+    esquinasFyP(5,flores,papeles)
+    derecha
+    
+    {lado3}
+    esquinasFyP(5,flores,papeles)
+    BloquearEsquina(15,9)
+    mover
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    mover
+    LiberarEsquina(15,9)
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    esquinasFyP(3,flores,papeles)
+    derecha
+    
+    {lado4}
+    esquinasFyP(6,flores,papeles)
+    BloquearEsquina(8,5)
+    mover
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    mover
+    LiberarEsquina(8,5)
+    juntarFlores(flores)
+    juntarPapeles(papeles)
+    esquinasFyP(2,flores,papeles)
+    derecha
+  fin
+    
+  proceso recorrerC9(ES papeles:numero)
+  comenzar
+    {lado1}
+    esquinasP(5,papeles)
+    BloquearEsquina(9,15)
+    mover
+    juntarPapeles(papeles)
+    mover
+    LiberarEsquina(9,15)
+    juntarPapeles(papeles)
+    derecha
+    
+    {lado2 y 3. No comparte con ningun otro}
+    repetir 2
+      esquinasP(7,papeles)
+      derecha
+    
+    {lado4}
+    BloquearEsquina(15,9)
+    mover
+    juntarPapeles(papeles)
+    mover
+    LiberarEsquina(15,9)
+    juntarPapeles(papeles)
+    esquinasP(5,papeles)
+    derecha
+  fin
+  
+areas
+  area:AreaPC(2,2,16,16)
+  calles:AreaPC(1,20,100,22)
+  areaF:AreaP(1,1,1,1)
+
+robots
+  robot tipo1
+  variables
+    flores:numero
+    calle:numero
+  comenzar
+    flores:=0
+    {cuadrante}
+    recorrerC2(flores)
+   {envio que termino}
+    EnviarMensaje(1,rFiscal)
+    
+   {recorrido calle} 
+    RecibirMensaje(calle,rFiscal)
+    Pos(1,calle)
+    derecha
+    si flores>100
+      flores:=100 {para que no se vaya de la ciudad}
+    repetir (flores -1)
+      depositarFlor
+      mover
+    si (flores>0)
+      depositarFlor
+  fin
+  
+  robot tipo2
+  variables
+    flores,papeles:numero
+    calle:numero
+    cant:numero
+  comenzar
+    flores:=0
+    papeles:=0
+    {cuadrante}
+    recorrerC5(flores,papeles)
+    
+    {envio mensaje que termine}
+    EnviarMensaje(2,rFiscal)
+    
+   {recorrido calle} 
+    RecibirMensaje(calle,rFiscal)
+    Pos(1,calle)
+    derecha
+    si flores>papeles
+      cant:=papeles
+    sino
+      cant:=flores
+    si cant>100
+      cant:=100
+    repetir (cant -1)
+      depositarFlor
+      depositarPapel
+      mover
+    si (cant>0){caso de la ultima esquina del recorrido}
+      depositarFlor
+      depositarPapel
+  fin
+
+  robot tipo3
+  variables
+    papeles:numero
+    calle:numero
+    id:numero
+  comenzar
+    papeles:=0
+    {cuadrante}
+    recorrerC9(papeles)
+    
+    {envio que termino el cuadrante}
+    EnviarMensaje(3,rFiscal)
+   {recorrido calle} 
+    RecibirMensaje(calle,rFiscal)
+    Pos(1,calle)
+    derecha
+    si papeles>100
+      papeles:=100
+    repetir (papeles -1)
+      depositarPapel
+      mover
+    si (papeles>0){en la ultima esquina}
+      depositarPapel 
+  fin 
+ 
+
+  robot fiscalizador
+  variables
+    id,aux:numero
+    calle:numero
+    pri,seg,ter:numero
+  comenzar
+
+    calle:=20
+    aux:=1
+    repetir 3
+      RecibirMensaje(id,*)
+      si aux=1
+        pri:=id
+      sino
+        si aux=2
+          seg:=id
+        sino
+          ter:=id
+      aux:=aux+1
+    enviarCod(pri,20)
+    enviarCod(seg,21)
+    enviarCod(ter,22)
+  fin
+  
+variables
+  r1:tipo1
+  r2:tipo2
+  r3:tipo3
+  rFiscal:fiscalizador
+comenzar
+  AsignarArea(rFiscal,areaF)
+  AsignarArea(r1,area)
+  AsignarArea(r1,calles)
+  AsignarArea(r2,area)
+  AsignarArea(r2,calles)
+  AsignarArea(r3,area)
+  AsignarArea(r3,calles)
+  
+  Iniciar(rFiscal,1,1)
+  Iniciar(r1,2,2)
+  Iniciar(r2,5,5)
+  Iniciar(r3,9,9)
+fin
+
+
+
